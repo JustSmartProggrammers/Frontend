@@ -128,9 +128,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarsFurni">
         <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-          <li><a class="nav-link" href="index.html">메인화면</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">메인화면</a>
+          </li>
           <li><a class="nav-link" href="reservation.html">스포츠 시설 정보</a></li>
-          <li><a class="nav-link" href="contact.html">커뮤니티</a></li>
+          <li class="active"><a class="nav-link" href="contact.html">커뮤니티</a></li>
+          <li><a class="nav-link" href="mypage.html">마이페이지</a></li>
         </ul>
         <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
           <li><a class="nav-link" href="login.html"><img src="images/user.svg"></a></li>
@@ -140,19 +143,18 @@
   </nav>
   <!-- End Header/Navigation -->
 
-  <div class="hero">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col-lg-5">
-          <div class="intro-excerpt">
-            <h1 style="white-space: nowrap;">커뮤니티</h1>
-          </div>
-        </div>
-        <div class="col-lg-7">
+ <!-- Start Hero Section -->
+ <div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-5">
+        <div class="intro-excerpt">
+          <h1>커뮤니티</h1>
         </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- 게시물 작성 섹션 시작 -->
   <div class="container mt-5">
@@ -167,37 +169,50 @@
                 <div class="form-group">
                   <label for="regionSelect">지역 선택</label>
                   <select class="form-control" id="regionSelect">
-                    <option>서울</option>
-                    <option>인천</option>
-                    <option>대전</option>
-                    <option>세종</option>
-                    <option>경기</option>
-                    <option>강원</option>
-                    <option>충북</option>
-                    <option>충남</option>
-                    <option>광주</option>
-                    <option>대구</option>
-                    <option>울산</option>
-                    <option>부산</option>
-                    <option>전북</option>
-                    <option>전남</option>
-                    <option>경북</option>
-                    <option>경남</option>
-                    <option>제주</option>
+                    <option>강남</option>
+                    <option>강동</option>
+                    <option>강북</option>
+                    <option>강서</option>
+                    <option>강남</option>
+                    <option>관악</option>
+                    <option>광진</option>
+                    <option>구로</option>
+                    <option>금천</option>
+                    <option>노원</option>
+                    <option>도봉</option>
+                    <option>동대문</option>
+                    <option>동작</option>
+                    <option>마포</option>
+                    <option>서대문</option>
+                    <option>서초</option>
+                    <option>성동</option>
+                    <option>성북</option>
+                    <option>송파</option>
+                    <option>양천</option>
+                    <option>영등포</option>
+                    <option>용산</option>
+                    <option>은평</option>
+                    <option>종로</option>
+                    <option>중구</option>
+                    <option>중랑</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label for="categorySelect">종목 선택</label>
                   <select class="form-control" id="categorySelect">
-                    <option>축구</option>
-                    <option>야구</option>
+                    <option>게이트볼</option>
+                    <option>골프</option>
                     <option>농구</option>
                     <option>배구</option>
-                    <option>탁구</option>
+                    <option>배드민턴</option>
+                    <option>빙상</option>
                     <option>수영</option>
-                    <option>복싱</option>
-                    <option>씨름</option>
+                    <option>야구</option>
+                    <option>족구</option>
+                    <option>축구</option>
+                    <option>테니스</option>
+                    <option>풋살</option>
                   </select>
                 </div>
               </div>
@@ -248,7 +263,7 @@
       const content = document.getElementById('postContent').value;
       const region = document.getElementById('regionSelect').value;
       const category = document.getElementById('categorySelect').value;
-
+  
       if (title || content || region || category) {
         localStorage.setItem('draftTitle', title);
         localStorage.setItem('draftContent', content);
@@ -259,14 +274,14 @@
         alert('저장할 내용이 없습니다.');
       }
     }
-
+  
     // 불러오기 기능
     function loadDraft() {
       const savedTitle = localStorage.getItem('draftTitle');
       const savedContent = localStorage.getItem('draftContent');
       const savedRegion = localStorage.getItem('draftRegion');
       const savedCategory = localStorage.getItem('draftCategory');
-
+  
       if (savedTitle || savedContent || savedRegion || savedCategory) {
         if (confirm('임시 저장된 내용을 불러오시겠습니까?')) {
           document.getElementById('postTitle').value = savedTitle;
@@ -278,7 +293,7 @@
         alert('불러올 임시 저장된 내용이 없습니다.');
       }
     }
-
+  
     // 게시물 작성 시 임시 저장된 내용 삭제 후 리다이렉트
     function submitPost(event) {
       event.preventDefault();
@@ -287,17 +302,44 @@
       localStorage.removeItem('draftRegion');
       localStorage.removeItem('draftCategory');
       alert('게시물이 작성되었습니다.');
-
+  
       // 작성 완료 후 contact.html로 이동
       window.location.href = 'contact.html';
     }
-
+  
     // 파일명 표시 기능
     function showFileName(input, targetId) {
       const fileName = input.files.length > 0 ? input.files[0].name : '파일 없음';
       document.getElementById(targetId).textContent = fileName;
     }
-  </script>
-
+  
+    // 제목 및 내용 입력 확인 기능
+    function validateForm() {
+      const title = document.getElementById('postTitle').value.trim();
+      const content = document.getElementById('postContent').value.trim();
+  
+      if (!title) {
+        alert("제목을 입력해 주세요.");
+        return false;
+      }
+  
+      if (!content) {
+        alert("내용을 입력해 주세요.");
+        return false;
+      }
+  
+      return true;
+    }
+  
+    // 기존 submitPost 함수를 실행하기 전에 validateForm을 호출하여 검증
+    document.getElementById('postForm').onsubmit = function(event) {
+      if (!validateForm()) {
+        event.preventDefault();
+      } else {
+        submitPost(event);
+      }
+    };
+  </script>  
+  
 </body>
 </html>

@@ -1,10 +1,3 @@
-<!-- /*
-* Bootstrap 5
-* Template Name: Furni
-* Template Author: Untree.co
-* Template URI: https://untree.co/
-* License: https://creativecommons.org/licenses/by/3.0/
-*/ -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -36,13 +29,14 @@
 
 				<div class="collapse navbar-collapse" id="navbarsFurni">
 					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-						<li><a class="nav-link" href="index.html">메인화면</a></li>
+						<li class="active"><a class="nav-link" href="blog.html">메인화면</a></li>
 						<li><a class="nav-link" href="reservation.html">스포츠 시설 정보</a></li>
 						<li><a class="nav-link" href="contact.html">커뮤니티</a></li>
+						<li><a class="nav-link" href="mypage.html">마이페이지</a></li>
 					</ul>
 
-					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-						<li><a class="nav-link" href="login.html"><img src="images/user.svg"></a></li>
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5" id="userMenu">
+						<!-- 로그인 상태에 따라 동적으로 변경되는 부분 -->
 					</ul>
 				</div>
 			</div>
@@ -68,84 +62,7 @@
 			</div>
 		</div>
 
-		<!-- Start Testimonial Slider -->
-		<div class="testimonial-section">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-7 mx-auto text-center">
-						<h2 class="section-title">Articles</h2>
-					</div>
-				</div>
-
-				<div class="row justify-content-center">
-					<div class="col-lg-12">
-						<div class="testimonial-slider-wrap text-center">
-
-							<div id="testimonial-nav">
-								<span class="prev" data-controls="prev"><span class="fa fa-chevron-left"></span></span>
-								<span class="next" data-controls="next"><span class="fa fa-chevron-right"></span></span>
-							</div>
-
-							<div class="testimonial-slider">
-								
-								<div class="item">
-									<div class="row justify-content-center">
-										<div class="col-lg-8 mx-auto">
-
-											<div class="testimonial-block text-center">
-												<blockquote class="mb-5">
-													<p>&ldquo;
-														스포츠활동의 목적이 건강 유지에서 체형관리, 자아실현, 사교 등으로 다양화됨에 따라 관련 스포츠활동 업종의 매출액도 함께 성장하고 있는 것으로 나타났다.						
-														전년 대비 매출액이 큰 폭으로 증가한 업종을 살펴보면 △스키장 82.2%, △수영장 89.7%, △헬스클럽 등 체력단련시설업이 25.9%, △테니스장, 탁구장, 스쿼시장, 암벽등반 등 기타스포츠시설업이 23.3% 증가한 것으로 분석했다.&rdquo;</p>
-												</blockquote>
-
-												<div class="author-info">
-													<div class="author-pic">
-														<img src="images/person-1.png" alt="Maria Jones" class="img-fluid">
-													</div>
-													<h3 class="font-weight-bold">Maria Jones</h3>
-													<span class="position d-block mb-3">CEO, Co-Founder, XYZ Inc.</span>
-												</div>
-											</div>
-
-										</div>
-									</div>
-								</div> 
-								<!-- END item -->
-
-								<div class="item">
-									<div class="row justify-content-center">
-										<div class="col-lg-8 mx-auto">
-
-											<div class="testimonial-block text-center">
-												<blockquote class="mb-5">
-													<p>&ldquo;가장 최근 MZ세대를 중심으로 테니스가 흥행몰이를 이어가고 있는 가운데, 서울 강남의 유일한 실내 테니스장 '테니스 타워'가 강남 '핫 플레이스'로 떠오르고 있다. 31일 업계에 따르면, 올해 국내 테니스 인구는 70만 명으로 지난해보다 약 10만명 늘어날 것으로 전망된다.&rdquo;</p>
-												</blockquote>
-
-												<div class="author-info">
-													<div class="author-pic">
-														<img src="images/person-1.png" alt="Maria Jones" class="img-fluid">
-													</div>
-													<h3 class="font-weight-bold">Maria Jones</h3>
-													<span class="position d-block mb-3">CEO, Co-Founder, XYZ Inc.</span>
-												</div>
-											</div>
-
-										</div>
-									</div>
-								</div> 
-								<!-- END item -->
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- End Testimonial Slider -->
-
-
-
-		<!-- Start Footer Section -->
+		<!-- Footer Section -->
 		<footer class="footer-section">
 			<div class="container relative">
 				<div class="row g-5 mb-5">
@@ -199,6 +116,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="border-top copyright">
 					<div class="row pt-4">
 						<div class="col-lg-6">
@@ -220,6 +138,36 @@
 		</footer>
 		<!-- End Footer Section -->	
 
+
+		<script>
+		// 로그인 여부 확인 함수 (예시로 localStorage 사용)
+		function checkLoginStatus() {
+			// localStorage에 로그인 여부를 저장한다고 가정
+			// localStorage.setItem('loggedIn', true); // 로그인된 상태 저장 예시
+			// localStorage.setItem('username', 'User Name'); // 사용자의 이름 저장 예시
+
+			const loggedIn = localStorage.getItem('loggedIn'); // 로그인 상태 가져오기
+			const userMenu = document.getElementById('userMenu');
+
+			if (loggedIn) {
+				const username = localStorage.getItem('username') || 'User'; // 사용자 이름 가져오기
+				userMenu.innerHTML = `
+					<li><a class="nav-link" href="mypage.html"><img src="images/user.svg"> ${username}</a></li>
+					<li><a class="nav-link" href="mypage.html">마이페이지</a></li>
+					<li><a class="nav-link" href="logout.html">로그아웃</a></li>
+				`;
+			} else {
+				userMenu.innerHTML = `
+					<li><a class="nav-link" href="login.html"><img src="images/user.svg"></a></li>
+				`;
+			}
+		}
+
+		// 페이지 로드 시 로그인 상태 확인
+		window.onload = function() {
+			checkLoginStatus();
+		};
+		</script>
 
 		<script src="js/bootstrap.bundle.min.js"></script>
 		<script src="js/tiny-slider.js"></script>
