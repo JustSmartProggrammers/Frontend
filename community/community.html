@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="/static/favicon.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+  <!-- Bootstrap CSS -->
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="/static/css/tiny-slider.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <title>Sports Spot - 커뮤니티</title>
+
+  <script src="/static/auth/auth.js"></script>
+  <script src="/static/nav/navbar.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    .table-container {
+      width: 100%;
+      padding: 20px;
+      padding-right: 220px;
+      padding-left: 220px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      word-wrap: break-word;
+    }
+
+    th {
+      background-color: #3b5d50;
+      color: white;
+      font-size: 16px;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      background-color: #f9f9f9;
+      border: none;
+      cursor: pointer;
+      padding: 10px 15px;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+
+    .pagination button:hover {
+      background-color: #3b5d50;
+      color: white;
+    }
+
+    .write-button {
+      background-color: #d9d9d9;
+      border: 1px solid black;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="navbar-placeholder"></div>
+
+<script>
+  $(document).ready(function(){
+    $("#navbar-placeholder").load("/static/nav/navbar.html", function() {
+      if (typeof setupNavbar === 'function') {
+        setupNavbar();
+      }
+    });
+
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalPosts = 0;
+    let totalPages = 0;
+
+    // 로그인 여부를 확인하는 함수
+    function isLoggedIn() {
+      const status = localStorage.getItem('isLoggedIn');
+      console.log('Login status:', status); // 로그인 상태 출력
+      return status === 'true';
+    }
+
+    // 글쓰기 버튼 클릭 시 로그인 여부 확인
+    function handleWriteButtonClick() {
+      console.log('Write button clicked'); // 버튼 클릭 로그
+      if (isLoggedIn()) {
+        console.log('User is logged in'); // 로그인 상태 확인 로그
+        // 로그인 되어 있으면 글쓰기 페이지로 이동
+        window.location.href = 'writecommunity.html';
+      } else {
+        console.log('User is not logged in'); // 로그인 상태 확인 로그
+        // 로그인 안 되어 있으면 로그인 페이지로 이동
+        alert("로그인을 하셔야 합니다.");
+        localStorage.setItem('redirectAfterLogin', 'writecommunity.html');  // 로그인 후 이동할 경로 저장
+        window.location.href = '/static/auth/login.html';  // 로그인 페이지로 이동
+      }
+    }
+
+    // 글 목록을 가져오는 함수
+    function fetchPosts(page) {
+      axios.get('http://localhost:8080/api/v1/posts', {
+        params: {
+          page: page,
+          perPage: itemsPerPage
+        }
+      })
+              .then(response => {
+                const posts = response.data;
+                const tableBody = $('#table-body');
+                tableBody.empty();  // 기존 목록 초기화
+
+                if (posts.length === 0) {
+                  tableBody.append('<tr class="no-content"><td colspan="5">글이 없습니다.</td></tr>');
+                } else {
+                  posts.sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
+
+                  posts.forEach((post, index) => {
+                    const row = `<tr>
+              <td>${(page - 1) * itemsPerPage + index + 1}</td>
+              <td><a href="/static/community/postDetail.html?postId=${post.id}">${post.title}</a></td>
+              <td>${post.author}</td>
+              <td>${new Date(post.createdDate).toLocaleDateString()}</td>
+              <td>${post.views}</td>
+            </tr>`;
+                    tableBody.append(row);
+                  });
+                }
+
+                totalPosts = parseInt(response.headers['x-total-count']);
+                totalPages = Math.ceil(totalPosts / itemsPerPage);
+                updatePagination();
+              })
+              .catch(error => {
+                console.error('Error fetching posts:', error);
+              });
+    }
+
+    // 페이지네이션 업데이트 함수
+    function updatePagination() {
+      const paginationContainer = $('.pagination');
+      paginationContainer.empty();
+
+      paginationContainer.append(`<button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>&lt;&lt;</button>`);
+      paginationContainer.append(`<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>`);
+
+      paginationContainer.append(`<button>${currentPage}</button>`);
+
+      paginationContainer.append(`<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`);
+      paginationContainer.append(`<button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>&gt;&gt;</button>`);
+    }
+
+    // 페이지 변경 함수
+    function changePage(page) {
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        fetchPosts(currentPage);
+      }
+    }
+
+    // 초기 페이지 로드
+    fetchPosts(currentPage);
+
+    // 글쓰기 버튼 클릭 시 로그인 여부 확인 이벤트 핸들러
+    $('.write-button').on('click', handleWriteButtonClick);
+
+    // 로그인 후 리다이렉트 처리
+    if (window.location.pathname === '/static/auth/login.html' && isLoggedIn()) {
+      const redirectAfterLogin = localStorage.getItem('redirectAfterLogin');
+      if (redirectAfterLogin) {
+        console.log('Redirecting after login to:', redirectAfterLogin); // 리다이렉트 로그
+        window.location.href = redirectAfterLogin;
+        localStorage.removeItem('redirectAfterLogin');
+      }
+    }
+  });
+</script>
+
+<!-- Hero Section -->
+<div class="hero">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-5">
+        <div class="intro-excerpt">
+          <h1>커뮤니티</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Community Section -->
+<div class="community-container">
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+      </tr>
+      </thead>
+      <tbody id="table-body">
+      <tr class="no-content">
+        <td colspan="5">글이 없습니다.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-container">
+    <div class="pagination"></div>
+    <button class="write-button">글쓰기</button> <!-- 글쓰기 버튼을 페이지네이션 옆으로 이동 -->
+  </div>
+</div>
+
+<!-- Footer Section -->
+<footer class="footer-section">
+  <!-- Footer 내용 -->
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/tiny-slider.js"></script>
+<script src="/static/js/custom.js"></script>
+
+</body>
+</html>

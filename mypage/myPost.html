@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <title>마이페이지 - 작성 글 목록</title>
+    <link rel="shortcut icon" href="../favicon.png">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+
+<!-- 작성 글 목록 -->
+<div class="col-lg-10 list-section" id="content-area" style="margin-left: 30px;">
+    <h2>작성글 목록</h2>
+    <div id="postList">
+        <ul id="postItems"></ul>
+        <div class="pagination">
+            <button id="prevPostPage">이전</button>
+            <span id="postPageNumbers"></span>
+            <button id="nextPostPage">다음</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .my-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 150px;
+    }
+
+    .my-buttons button {
+        padding: 8px 16px;
+        background-color: #3b5d50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .my-buttons button:hover {
+        background-color: #2f4b40;
+    }
+
+    .list-section ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .list-section ul li {
+        padding: 10px;
+        background-color: #f8f9fa;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+    .pagination button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #c0c0c0;
+        color: white;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+
+    .pagination span {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+</style>
+
+<script>
+    let currentPostPage = 1;
+    const itemsPerPage = 10;
+
+    async function fetchPosts(page, perPage) {
+        try {
+            const response = await axios.get('http://localhost:8080/api/v1/posts', {
+                params: {
+                    page: page,
+                    perPage: perPage
+                }
+            });
+            return response;  // 응답 객체를 반환
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            return { data: [], headers: {} };  // 오류 발생 시 빈 배열과 빈 헤더 객체 반환
+        }
+    }
+
+    async function renderPosts(page) {
+        const postItems = document.getElementById('postItems');
+        postItems.innerHTML = '';
+
+        const response = await fetchPosts(page, itemsPerPage);
+        const posts = response.data;
+
+        if (posts.length > 0) {
+            posts.forEach(post => {
+                const li = document.createElement('li');
+                li.textContent = post.title;
+                postItems.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = '작성한 글이 없습니다.';
+            postItems.appendChild(li);
+        }
+        updatePostPagination(page, response.headers['x-total-count']);
+    }
+
+    function updatePostPagination(page, totalPostsCount) {
+        const totalPages = Math.ceil(totalPostsCount / itemsPerPage);
+
+        document.getElementById('postPageNumbers').textContent = `Page ${page}`;
+        document.getElementById('prevPostPage').disabled = page === 1;
+        document.getElementById('nextPostPage').disabled = page >= totalPages;
+    }
+
+    document.getElementById('prevPostPage').addEventListener('click', function() {
+        if (currentPostPage > 1) {
+            currentPostPage--;
+            renderPosts(currentPostPage);
+        }
+    });
+
+    document.getElementById('nextPostPage').addEventListener('click', function () {
+        currentPostPage++;
+        renderPosts(currentPostPage);
+    });
+
+    renderPosts(currentPostPage);
+</script>
+</body>
+</html>
